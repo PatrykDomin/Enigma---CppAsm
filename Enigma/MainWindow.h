@@ -382,10 +382,11 @@ namespace Enigma {
 		HINSTANCE cppDll = LoadLibraryA("cppdll");
 		enigmaCpp enigmacpp;
 		enigmacpp = (enigmaCpp)GetProcAddress(cppDll, "enigma");
-		typedef char(_stdcall *enigmaAsm)(int, int);
+		//typedef char(_stdcall *enigmaAsm)(char*, char*, char*, char*, char*, char);
+		typedef char(_stdcall *enigmaAsm)(char*, char);
 		HINSTANCE asmDll = LoadLibraryA("asmdll");
 		enigmaAsm enigmaasm;
-		enigmaasm = (enigmaAsm)GetProcAddress(asmDll, "enigmaAsm");
+		enigmaasm = (enigmaAsm)GetProcAddress(asmDll, "getPosition");
 
 
 		std::string outputText;
@@ -395,6 +396,7 @@ namespace Enigma {
 		char rotor1baseArr[26] = { 'E', 'K', 'M', 'F', 'L', 'G', 'D', 'Q', 'V', 'Z', 'N', 'T', 'O', 'W', 'Y', 'H', 'X', 'U', 'S', 'P', 'A', 'I', 'B', 'R', 'C', 'J' };
 		char rotor2baseArr[26] = { 'A', 'J', 'D', 'K', 'S', 'I', 'R', 'U', 'X', 'B', 'L', 'H', 'W', 'T', 'M', 'C', 'Q', 'G', 'Z', 'N', 'P', 'Y', 'F', 'V', 'O', 'E' };
 		char rotor3baseArr[26] = { 'B', 'D', 'F', 'H', 'J', 'L', 'C', 'P', 'R', 'T', 'X', 'V', 'Z', 'N', 'Y', 'E', 'I', 'W', 'G', 'A', 'K', 'M', 'U', 'S', 'Q', 'O' };
+		char reflectorArr[26] = { 'Y', 'R', 'U', 'H', 'Q', 'S', 'L', 'D', 'P', 'X', 'N', 'G', 'O', 'K', 'M', 'I', 'E', 'B', 'F', 'Z', 'C', 'W', 'V', 'J', 'A', 'T' };
 
 		String^ userInputText = this->userInput1->Text->ToUpper();
 		
@@ -411,12 +413,19 @@ namespace Enigma {
 			}
 		}
 		else {
+			char* start = startingArr;
+			char* r1 = rotor1baseArr;
+			char* r2 = rotor2baseArr;
+			char* r3 = rotor3baseArr;
+			char* refl = reflectorArr;
 			for (int i = 0; i < userInputText->Length; i++) { //DLA A \/
 				if (userInputText[i] == L' ') {
 					letter = ' ';
 				}
 				else {
-					int zmienna = enigmaasm(2, 3); //assembler
+					//auto letter = enigmaasm(start, r1, r2, r3, refl, userInputText[i]); //assembler
+					int letter = enigmaasm(start, userInputText[i]); //assembler
+
 				}
 				outputText += letter; //to tutaj
 				moveRotors(rotor1baseArr, rotor3baseArr); //to tutaj
