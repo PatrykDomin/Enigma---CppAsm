@@ -2,18 +2,33 @@
 
 #include <string>
 #include <chrono>
+#include <algorithm>
+#include <Windows.h>
 
-void moveRotors(std::string& rotor1, std::string& rotor3) {
-	std::string rotor1Change;
-	std::string rotor3Change;
-	rotor1Change = rotor1[25];
-	rotor1.erase(25, 1);
-	rotor1.insert(0, rotor1Change);
-	rotor3Change = rotor3[0];
-	rotor3.erase(0, 1);
-	rotor3.insert(25, rotor3Change);
+void moveRotors(char arr1[26], char arr2[26]) {
+	char tmp[26] = {};
+	char tmp2[26] = {};
+	tmp[0] = arr1[25];
+	tmp2[25] = arr2[0];
+
+	for (int i = 0; i < 26; i++) {
+		if (i != 25) {
+			tmp[i + 1] = arr1[i];
+			tmp2[i] = arr2[i + 1];
+		}
+	}
+	strncpy(arr1, tmp, 26);
+	strncpy(arr2, tmp2, 26);
 }
 
+int getposition(char arr[26], char character) {
+	for (int i = 0; i < 26; ++i) {
+		if (arr[i] == character) {
+			return i;
+			break;
+		}
+	}
+}
 
 
 namespace Enigma {
@@ -25,6 +40,13 @@ namespace Enigma {
 	using namespace System::Data;
 	using namespace System::Drawing;
 
+	char startingArr[26] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+	char rotor1baseArr[26] = { 'E', 'K', 'M', 'F', 'L', 'G', 'D', 'Q', 'V', 'Z', 'N', 'T', 'O', 'W', 'Y', 'H', 'X', 'U', 'S', 'P', 'A', 'I', 'B', 'R', 'C', 'J' };
+	char rotor2baseArr[26] = { 'A', 'J', 'D', 'K', 'S', 'I', 'R', 'U', 'X', 'B', 'L', 'H', 'W', 'T', 'M', 'C', 'Q', 'G', 'Z', 'N', 'P', 'Y', 'F', 'V', 'O', 'E' };
+	char rotor3baseArr[26] = { 'B', 'D', 'F', 'H', 'J', 'L', 'C', 'P', 'R', 'T', 'X', 'V', 'Z', 'N', 'Y', 'E', 'I', 'W', 'G', 'A', 'K', 'M', 'U', 'S', 'Q', 'O' };
+	char reflectorArr[26] = { 'Y', 'R', 'U', 'H', 'Q', 'S', 'L', 'D', 'P', 'X', 'N', 'G', 'O', 'K', 'M', 'I', 'E', 'B', 'F', 'Z', 'C', 'W', 'V', 'J', 'A', 'T' };
+
+	
 	std::string starting = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	std::string rotor1base = "EKMFLGDQVZNTOWYHXUSPAIBRCJ";
 	std::string rotor2base = "AJDKSIRUXBLHWTMCQGZNPYFVOE";
@@ -356,38 +378,52 @@ namespace Enigma {
 		auto start = std::chrono::steady_clock::now();
 		this->time->Text = L"Time: ";
 
-		std::string outputText;
-		std::string tmpLetter;
-		int letterIndex;
+		typedef char(_stdcall *enigmaCpp)(char[], char[], char[], char);
+		HINSTANCE cppDll = LoadLibraryA("cppdll");
+		enigmaCpp enigmacpp;
+		enigmacpp = (enigmaCpp)GetProcAddress(cppDll, "enigma");
+		typedef char(_stdcall *enigmaAsm)(int, int);
+		HINSTANCE asmDll = LoadLibraryA("asmdll");
+		enigmaAsm enigmaasm;
+		enigmaasm = (enigmaAsm)GetProcAddress(asmDll, "enigmaAsm");
 
-		std::string rotor1 = rotor1base;
-		std::string rotor2 = rotor2base;
-		std::string rotor3 = rotor3base;
+
+		std::string outputText;
+		char letter;
+
+		char startingArr[26] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+		char rotor1baseArr[26] = { 'E', 'K', 'M', 'F', 'L', 'G', 'D', 'Q', 'V', 'Z', 'N', 'T', 'O', 'W', 'Y', 'H', 'X', 'U', 'S', 'P', 'A', 'I', 'B', 'R', 'C', 'J' };
+		char rotor2baseArr[26] = { 'A', 'J', 'D', 'K', 'S', 'I', 'R', 'U', 'X', 'B', 'L', 'H', 'W', 'T', 'M', 'C', 'Q', 'G', 'Z', 'N', 'P', 'Y', 'F', 'V', 'O', 'E' };
+		char rotor3baseArr[26] = { 'B', 'D', 'F', 'H', 'J', 'L', 'C', 'P', 'R', 'T', 'X', 'V', 'Z', 'N', 'Y', 'E', 'I', 'W', 'G', 'A', 'K', 'M', 'U', 'S', 'Q', 'O' };
 
 		String^ userInputText = this->userInput1->Text->ToUpper();
-		for (int i = 0; i < userInputText->Length; i++) { //DLA A \/
-			if (userInputText[i] == L' ') {
-				tmpLetter = " ";
+		
+		if (this->cppButton->Checked == true) {
+			for (int i = 0; i < userInputText->Length; i++) { //DLA A \/
+				if (userInputText[i] == L' ') {
+					letter = ' ';
+				}
+				else {
+					letter = enigmacpp(rotor1baseArr, rotor2baseArr, rotor3baseArr, userInputText[i]);
+				}
+				outputText += letter; //to tutaj
+				moveRotors(rotor1baseArr, rotor3baseArr); //to tutaj
 			}
-			else {
-				letterIndex = starting.find(userInputText[i]); // 0
-				tmpLetter = rotor1[letterIndex]; // E
-				letterIndex = starting.find(tmpLetter); // 4
-				tmpLetter = rotor2[letterIndex]; // S
-				letterIndex = starting.find(tmpLetter); // 18
-				tmpLetter = rotor3[letterIndex]; // G
-				letterIndex = starting.find(tmpLetter); // 6
-				tmpLetter = reflector[letterIndex]; // L
-				letterIndex = rotor3.find(tmpLetter); // 5
-				tmpLetter = starting[letterIndex]; // F
-				letterIndex = rotor2.find(tmpLetter); // 22
-				tmpLetter = starting[letterIndex]; // W
-				letterIndex = rotor1.find(tmpLetter); // 13
-				tmpLetter = starting[letterIndex]; // N jako 78	
-			}
-			outputText += tmpLetter;
-			moveRotors(rotor1, rotor3);
 		}
+		else {
+			for (int i = 0; i < userInputText->Length; i++) { //DLA A \/
+				if (userInputText[i] == L' ') {
+					letter = ' ';
+				}
+				else {
+					int zmienna = enigmaasm(2, 3); //assembler
+				}
+				outputText += letter; //to tutaj
+				moveRotors(rotor1baseArr, rotor3baseArr); //to tutaj
+			}
+		}
+
+
 		this->outText->Text = gcnew String(outputText.c_str());
 		auto end = std::chrono::steady_clock::now();
 		auto diffChrono = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
