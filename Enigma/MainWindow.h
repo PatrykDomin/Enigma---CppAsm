@@ -382,12 +382,10 @@ namespace Enigma {
 		HINSTANCE cppDll = LoadLibraryA("cppdll");
 		enigmaCpp enigmacpp;
 		enigmacpp = (enigmaCpp)GetProcAddress(cppDll, "enigma");
-		//typedef char(_stdcall *enigmaAsm)(char*, char*, char*, char*, char*, char);
-		typedef char(_stdcall *enigmaAsm)(char*, char);
+		typedef char(_stdcall *enigmaAsm)(char*, char*, char*, char*, char*, char);
 		HINSTANCE asmDll = LoadLibraryA("asmdll");
 		enigmaAsm enigmaasm;
-		enigmaasm = (enigmaAsm)GetProcAddress(asmDll, "getPosition");
-
+		enigmaasm = (enigmaAsm)GetProcAddress(asmDll, "enigmaAsm");
 
 		std::string outputText;
 		char letter;
@@ -418,17 +416,15 @@ namespace Enigma {
 			char* r2 = rotor2baseArr;
 			char* r3 = rotor3baseArr;
 			char* refl = reflectorArr;
-			for (int i = 0; i < userInputText->Length; i++) { //DLA A \/
+			for (int i = 0; i < userInputText->Length; i++) { 
 				if (userInputText[i] == L' ') {
 					letter = ' ';
 				}
 				else {
-					//auto letter = enigmaasm(start, r1, r2, r3, refl, userInputText[i]); //assembler
-					int letter = enigmaasm(start, userInputText[i]); //assembler
-
+					letter = enigmaasm(start, r1, r2, r3, refl, userInputText[i]); //assembler
 				}
-				outputText += letter; //to tutaj
-				moveRotors(rotor1baseArr, rotor3baseArr); //to tutaj
+				outputText += letter; 
+				moveRotors(rotor1baseArr, rotor3baseArr); 
 			}
 		}
 

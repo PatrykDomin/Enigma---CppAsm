@@ -49,7 +49,31 @@ getPosition endp
 
 enigmaAsm proc starting: DWORD, r1: DWORD, r2: DWORD, r3: DWORD, reflector: DWORD, letter: BYTE
 
-invoke getPosition, starting, letter
+	invoke getPosition, starting, letter
+	mov ebx, r1									;ebx - current rotor
+	mov edx, [ebx + eax]						;edx - output letter
+	invoke getPosition, starting, dl
+	mov ebx, r2
+	mov edx, [ebx + eax]
+	invoke getPosition, starting, dl
+	mov ebx, r3
+	mov edx, [ebx + eax]
+
+	invoke getPosition, starting, dl
+	mov ebx, reflector
+	mov edx, [ebx + eax]
+
+	invoke getPosition, r3, dl
+	mov ebx, starting									  
+	mov edx, [ebx + eax]
+	invoke getPosition, r2, dl
+	mov ebx, starting
+	mov edx, [ebx + eax]
+	invoke getPosition, r1, dl
+	mov ebx, starting
+	mov edx, [ebx + eax]
+
+	mov eax, edx
 
 ret
 enigmaAsm endp
