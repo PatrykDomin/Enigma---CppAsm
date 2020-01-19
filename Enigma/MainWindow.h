@@ -5,31 +5,9 @@
 #include <algorithm>
 #include <Windows.h>
 
-void moveRotors(char arr1[26], char arr2[26]) {
-	char tmp[26] = {};
-	char tmp2[26] = {};
-	tmp[0] = arr1[25];
-	tmp2[25] = arr2[0];
-
-	for (int i = 0; i < 26; i++) {
-		if (i != 25) {
-			tmp[i + 1] = arr1[i];
-			tmp2[i] = arr2[i + 1];
-		}
-	}
-	strncpy(arr1, tmp, 26);
-	strncpy(arr2, tmp2, 26);
-}
-
-int getposition(char arr[26], char character) {
-	for (int i = 0; i < 26; ++i) {
-		if (arr[i] == character) {
-			return i;
-			break;
-		}
-	}
-}
-
+void moveRotorUp(char[26]);
+void moveRotorDown(char[26]);
+void updateRotor(System::Windows::Forms::Label^, char[26]);
 
 namespace Enigma {
 
@@ -41,12 +19,12 @@ namespace Enigma {
 	using namespace System::Drawing;
 
 	char startingArr[26] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
-	char rotor1baseArr[26] = { 'E', 'K', 'M', 'F', 'L', 'G', 'D', 'Q', 'V', 'Z', 'N', 'T', 'O', 'W', 'Y', 'H', 'X', 'U', 'S', 'P', 'A', 'I', 'B', 'R', 'C', 'J' };
-	char rotor2baseArr[26] = { 'A', 'J', 'D', 'K', 'S', 'I', 'R', 'U', 'X', 'B', 'L', 'H', 'W', 'T', 'M', 'C', 'Q', 'G', 'Z', 'N', 'P', 'Y', 'F', 'V', 'O', 'E' };
-	char rotor3baseArr[26] = { 'B', 'D', 'F', 'H', 'J', 'L', 'C', 'P', 'R', 'T', 'X', 'V', 'Z', 'N', 'Y', 'E', 'I', 'W', 'G', 'A', 'K', 'M', 'U', 'S', 'Q', 'O' };
+	char rotor1Arr[26] = { 'E', 'K', 'M', 'F', 'L', 'G', 'D', 'Q', 'V', 'Z', 'N', 'T', 'O', 'W', 'Y', 'H', 'X', 'U', 'S', 'P', 'A', 'I', 'B', 'R', 'C', 'J' };
+	char rotor2Arr[26] = { 'A', 'J', 'D', 'K', 'S', 'I', 'R', 'U', 'X', 'B', 'L', 'H', 'W', 'T', 'M', 'C', 'Q', 'G', 'Z', 'N', 'P', 'Y', 'F', 'V', 'O', 'E' };
+	char rotor3Arr[26] = { 'B', 'D', 'F', 'H', 'J', 'L', 'C', 'P', 'R', 'T', 'X', 'V', 'Z', 'N', 'Y', 'E', 'I', 'W', 'G', 'A', 'K', 'M', 'U', 'S', 'Q', 'O' };
 	char reflectorArr[26] = { 'Y', 'R', 'U', 'H', 'Q', 'S', 'L', 'D', 'P', 'X', 'N', 'G', 'O', 'K', 'M', 'I', 'E', 'B', 'F', 'Z', 'C', 'W', 'V', 'J', 'A', 'T' };
 
-	
+
 	std::string starting = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	std::string rotor1base = "EKMFLGDQVZNTOWYHXUSPAIBRCJ";
 	std::string rotor2base = "AJDKSIRUXBLHWTMCQGZNPYFVOE";
@@ -375,112 +353,89 @@ namespace Enigma {
 		}
 	}
 	private: System::Void startButton_Click(System::Object^  sender, System::EventArgs^  e) {
+		std::string outputText;
+		char letter;
+		String^ userInputText = this->userInput1->Text->ToUpper();
+
+		char r1Arr[26];
+		char r2Arr[26];
+		char r3Arr[26];
+		strncpy(r1Arr, rotor1Arr, 26);
+		strncpy(r2Arr, rotor2Arr, 26);
+		strncpy(r3Arr, rotor3Arr, 26);
+
 		auto start = std::chrono::steady_clock::now();
 		this->time->Text = L"Time: ";
 
-		typedef char(_stdcall *enigmaCpp)(char[], char[], char[], char);
-		HINSTANCE cppDll = LoadLibraryA("cppdll");
-		enigmaCpp enigmacpp;
-		enigmacpp = (enigmaCpp)GetProcAddress(cppDll, "enigma");
-		typedef char(_stdcall *enigmaAsm)(char*, char*, char*, char*, char*, char);
-		HINSTANCE asmDll = LoadLibraryA("asmdll");
-		enigmaAsm enigmaasm;
-		enigmaasm = (enigmaAsm)GetProcAddress(asmDll, "enigmaAsm");
-
-		std::string outputText;
-		char letter;
-
-		char startingArr[26] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
-		char rotor1baseArr[26] = { 'E', 'K', 'M', 'F', 'L', 'G', 'D', 'Q', 'V', 'Z', 'N', 'T', 'O', 'W', 'Y', 'H', 'X', 'U', 'S', 'P', 'A', 'I', 'B', 'R', 'C', 'J' };
-		char rotor2baseArr[26] = { 'A', 'J', 'D', 'K', 'S', 'I', 'R', 'U', 'X', 'B', 'L', 'H', 'W', 'T', 'M', 'C', 'Q', 'G', 'Z', 'N', 'P', 'Y', 'F', 'V', 'O', 'E' };
-		char rotor3baseArr[26] = { 'B', 'D', 'F', 'H', 'J', 'L', 'C', 'P', 'R', 'T', 'X', 'V', 'Z', 'N', 'Y', 'E', 'I', 'W', 'G', 'A', 'K', 'M', 'U', 'S', 'Q', 'O' };
-		char reflectorArr[26] = { 'Y', 'R', 'U', 'H', 'Q', 'S', 'L', 'D', 'P', 'X', 'N', 'G', 'O', 'K', 'M', 'I', 'E', 'B', 'F', 'Z', 'C', 'W', 'V', 'J', 'A', 'T' };
-
-		String^ userInputText = this->userInput1->Text->ToUpper();
-		
 		if (this->cppButton->Checked == true) {
+			typedef char(_stdcall *enigmaCpp)(char[], char[], char[], char);
+			HINSTANCE cppDll = LoadLibraryA("cppdll");
+			enigmaCpp enigmacpp;
+			enigmacpp = (enigmaCpp)GetProcAddress(cppDll, "enigma");
 			for (int i = 0; i < userInputText->Length; i++) { //DLA A \/
 				if (userInputText[i] == L' ') {
 					letter = ' ';
 				}
 				else {
-					letter = enigmacpp(rotor1baseArr, rotor2baseArr, rotor3baseArr, userInputText[i]);
+					letter = enigmacpp(r1Arr, r2Arr, r3Arr, userInputText[i]);
 				}
-				outputText += letter; //to tutaj
-				moveRotors(rotor1baseArr, rotor3baseArr); //to tutaj
+				outputText += letter;
+				moveRotorUp(r1Arr);
+				moveRotorDown(r3Arr);
 			}
 		}
 		else {
+			typedef char(_stdcall *enigmaAsm)(char*, char*, char*, char*, char*, char);
+			HINSTANCE asmDll = LoadLibraryA("asmdll");
+			enigmaAsm enigmaasm;
+			enigmaasm = (enigmaAsm)GetProcAddress(asmDll, "enigmaAsm");
 			char* start = startingArr;
-			char* r1 = rotor1baseArr;
-			char* r2 = rotor2baseArr;
-			char* r3 = rotor3baseArr;
+			char* r1 = r1Arr;
+			char* r2 = r2Arr;
+			char* r3 = r3Arr;
 			char* refl = reflectorArr;
-			for (int i = 0; i < userInputText->Length; i++) { 
+			for (int i = 0; i < userInputText->Length; i++) {
 				if (userInputText[i] == L' ') {
 					letter = ' ';
 				}
 				else {
 					letter = enigmaasm(start, r1, r2, r3, refl, userInputText[i]); //assembler
 				}
-				outputText += letter; 
-				moveRotors(rotor1baseArr, rotor3baseArr); 
+				outputText += letter;
+				moveRotorUp(r1Arr);
+				moveRotorDown(r3Arr);
 			}
 		}
 
-
-		this->outText->Text = gcnew String(outputText.c_str());
 		auto end = std::chrono::steady_clock::now();
 		auto diffChrono = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 		this->time->Text = this->time->Text + diffChrono + L"µs";
+
+		this->outText->Text = gcnew String(outputText.c_str());
 	}
 	private: System::Void upRotor1_Click(System::Object^  sender, System::EventArgs^  e) {
-		std::string rotor1Change;
-		rotor1Change = rotor1base[25];
-		rotor1base.erase(25, 1);
-		rotor1base.insert(0, rotor1Change);
-		rotor1Change = rotor1base[0];
-		this->rotor1->Text = gcnew String(rotor1Change.c_str());
+		moveRotorUp(rotor1Arr);
+		updateRotor(rotor1, rotor1Arr);
 	}
 	private: System::Void downRotor1_Click(System::Object^  sender, System::EventArgs^  e) {
-		std::string rotor1Change;
-		rotor1Change = rotor1base[0];
-		rotor1base.erase(0, 1);
-		rotor1base.insert(25, rotor1Change);
-		rotor1Change = rotor1base[0];
-		this->rotor1->Text = gcnew String(rotor1Change.c_str());
+		moveRotorDown(rotor1Arr);
+		updateRotor(rotor1, rotor1Arr);
 	}
 	private: System::Void upRotor2_Click(System::Object^  sender, System::EventArgs^  e) {
-		std::string rotor2Change;
-		rotor2Change = rotor2base[25];
-		rotor2base.erase(25, 1);
-		rotor2base.insert(0, rotor2Change);
-		rotor2Change = rotor2base[0];
-		this->rotor2->Text = gcnew String(rotor2Change.c_str());
+		moveRotorUp(rotor2Arr);
+		updateRotor(rotor2, rotor2Arr);
 	}
 	private: System::Void downRotor2_Click(System::Object^  sender, System::EventArgs^  e) {
-		std::string rotor2Change;
-		rotor2Change = rotor2base[0];
-		rotor2base.erase(0, 1);
-		rotor2base.insert(25, rotor2Change);
-		rotor2Change = rotor2base[0];
-		this->rotor2->Text = gcnew String(rotor2Change.c_str());
+		moveRotorDown(rotor2Arr);
+		updateRotor(rotor2, rotor2Arr);
 	}
 	private: System::Void upRotor3_Click(System::Object^  sender, System::EventArgs^  e) {
-		std::string rotor3Change;
-		rotor3Change = rotor3base[25];
-		rotor3base.erase(25, 1);
-		rotor3base.insert(0, rotor3Change);
-		rotor3Change = rotor3base[0];
-		this->rotor3->Text = gcnew String(rotor3Change.c_str());
+		moveRotorUp(rotor3Arr);
+		updateRotor(rotor3, rotor3Arr);
 	}
 	private: System::Void downRotor3_Click(System::Object^  sender, System::EventArgs^  e) {
-		std::string rotor3Change;
-		rotor3Change = rotor3base[0];
-		rotor3base.erase(0, 1);
-		rotor3base.insert(25, rotor3Change);
-		rotor3Change = rotor3base[0];
-		this->rotor3->Text = gcnew String(rotor3Change.c_str());
+		moveRotorDown(rotor3Arr);
+		updateRotor(rotor3, rotor3Arr);
 	}
 	};
 }
