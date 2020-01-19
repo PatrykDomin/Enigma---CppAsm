@@ -15,10 +15,7 @@ DllEntry PROC hInstDLL:HINSTANCE, reason:DWORD, reserved1:DWORD
 
 mov eax, TRUE 
 ret
-DllEntry ENDP
-;------------------------------------------------------------------------- 
-; To jest przyk³adowa funkcja. Jest tutaj, aby pokazaæ, 
-; gdzie nale¿y umieszczaæ w³asne funkcje w bibliotece DLL 
+DllEntry ENDP 
 ;-------------------------------------------------------------------------
 
 
@@ -28,10 +25,9 @@ getPosition proc arr:DWORD, character: BYTE
 	mov ebx, arr
 	mov ecx, 0
 Loop1:
-	mov eax, r
+	mov eax, r				;r - size
 	cmp i, eax
 	jge End1
-
 	mov eax, [ebx + ecx]
 	mov dl, character
 	cmp al, dl
@@ -51,31 +47,31 @@ enigmaAsm proc starting: DWORD, r1: DWORD, r2: DWORD, r3: DWORD, reflector: DWOR
 
 	invoke getPosition, starting, letter
 	mov ebx, r1									;ebx - current rotor
-	mov edx, [ebx + eax]						;edx - output letter
-	invoke getPosition, starting, dl
+	mov eax, [ebx + eax]						;eax - output letter
+	invoke getPosition, starting, al
 	mov ebx, r2
-	mov edx, [ebx + eax]
-	invoke getPosition, starting, dl
+	mov eax, [ebx + eax]
+	invoke getPosition, starting, al
 	mov ebx, r3
-	mov edx, [ebx + eax]
+	mov eax, [ebx + eax]
 
-	invoke getPosition, starting, dl
+	invoke getPosition, starting, al
 	mov ebx, reflector
-	mov edx, [ebx + eax]
+	mov eax, [ebx + eax]
 
-	invoke getPosition, r3, dl
+	invoke getPosition, r3, al
 	mov ebx, starting									  
-	mov edx, [ebx + eax]
-	invoke getPosition, r2, dl
+	mov eax, [ebx + eax]
+	invoke getPosition, r2, al
 	mov ebx, starting
-	mov edx, [ebx + eax]
-	invoke getPosition, r1, dl
+	mov eax, [ebx + eax]
+	invoke getPosition, r1, al
 	mov ebx, starting
-	mov edx, [ebx + eax]
+	mov eax, [ebx + eax]
 
-	mov eax, edx
+	ret
 
-ret
 enigmaAsm endp
+
 END DllEntry 
 ;-------------------------------------------------------------------------

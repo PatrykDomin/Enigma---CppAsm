@@ -24,13 +24,6 @@ namespace Enigma {
 	char rotor3Arr[26] = { 'B', 'D', 'F', 'H', 'J', 'L', 'C', 'P', 'R', 'T', 'X', 'V', 'Z', 'N', 'Y', 'E', 'I', 'W', 'G', 'A', 'K', 'M', 'U', 'S', 'Q', 'O' };
 	char reflectorArr[26] = { 'Y', 'R', 'U', 'H', 'Q', 'S', 'L', 'D', 'P', 'X', 'N', 'G', 'O', 'K', 'M', 'I', 'E', 'B', 'F', 'Z', 'C', 'W', 'V', 'J', 'A', 'T' };
 
-
-	std::string starting = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	std::string rotor1base = "EKMFLGDQVZNTOWYHXUSPAIBRCJ";
-	std::string rotor2base = "AJDKSIRUXBLHWTMCQGZNPYFVOE";
-	std::string rotor3base = "BDFHJLCPRTXVZNYEIWGAKMUSQO";
-	std::string reflector = "YRUHQSLDPXNGOKMIEBFZCWVJAT";
-
 	/// <summary>
 	/// Podsumowanie informacji o MainWindow
 	/// </summary>
@@ -68,7 +61,6 @@ namespace Enigma {
 	private: System::Windows::Forms::Label^  rotor1;
 	private: System::Windows::Forms::Label^  rotor2;
 	private: System::Windows::Forms::Label^  rotor3;
-	private: System::Windows::Forms::Button^  encDecr;
 	private: System::Windows::Forms::RadioButton^  asmButton;
 	private: System::Windows::Forms::RadioButton^  cppButton;
 	private: System::Windows::Forms::Button^  startButton;
@@ -100,7 +92,6 @@ namespace Enigma {
 				 this->rotor2 = (gcnew System::Windows::Forms::Label());
 				 this->rotor3 = (gcnew System::Windows::Forms::Label());
 				 this->outText = (gcnew System::Windows::Forms::Label());
-				 this->encDecr = (gcnew System::Windows::Forms::Button());
 				 this->asmButton = (gcnew System::Windows::Forms::RadioButton());
 				 this->cppButton = (gcnew System::Windows::Forms::RadioButton());
 				 this->startButton = (gcnew System::Windows::Forms::Button());
@@ -118,7 +109,7 @@ namespace Enigma {
 				 this->userInput1->Location = System::Drawing::Point(12, 127);
 				 this->userInput1->Multiline = true;
 				 this->userInput1->Name = L"userInput1";
-				 this->userInput1->Size = System::Drawing::Size(310, 140);
+				 this->userInput1->Size = System::Drawing::Size(388, 140);
 				 this->userInput1->TabIndex = 1;
 				 // 
 				 // usrInpt1Label
@@ -155,7 +146,7 @@ namespace Enigma {
 				 this->rotor1->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
 				 this->rotor1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 25, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 					 static_cast<System::Byte>(238)));
-				 this->rotor1->Location = System::Drawing::Point(387, 139);
+				 this->rotor1->Location = System::Drawing::Point(429, 170);
 				 this->rotor1->Margin = System::Windows::Forms::Padding(0);
 				 this->rotor1->Name = L"rotor1";
 				 this->rotor1->Size = System::Drawing::Size(79, 57);
@@ -168,10 +159,10 @@ namespace Enigma {
 				 this->rotor2->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
 				 this->rotor2->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 25, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 					 static_cast<System::Byte>(238)));
-				 this->rotor2->Location = System::Drawing::Point(475, 139);
+				 this->rotor2->Location = System::Drawing::Point(518, 170);
 				 this->rotor2->Margin = System::Windows::Forms::Padding(0);
 				 this->rotor2->Name = L"rotor2";
-				 this->rotor2->Size = System::Drawing::Size(76, 57);
+				 this->rotor2->Size = System::Drawing::Size(78, 57);
 				 this->rotor2->TabIndex = 7;
 				 this->rotor2->Text = L"A";
 				 this->rotor2->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
@@ -181,10 +172,10 @@ namespace Enigma {
 				 this->rotor3->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
 				 this->rotor3->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 25, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 					 static_cast<System::Byte>(238)));
-				 this->rotor3->Location = System::Drawing::Point(564, 139);
+				 this->rotor3->Location = System::Drawing::Point(606, 170);
 				 this->rotor3->Margin = System::Windows::Forms::Padding(0);
 				 this->rotor3->Name = L"rotor3";
-				 this->rotor3->Size = System::Drawing::Size(76, 57);
+				 this->rotor3->Size = System::Drawing::Size(77, 57);
 				 this->rotor3->TabIndex = 8;
 				 this->rotor3->Text = L"B";
 				 this->rotor3->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
@@ -195,24 +186,14 @@ namespace Enigma {
 				 this->outText->BorderStyle = System::Windows::Forms::BorderStyle::Fixed3D;
 				 this->outText->Location = System::Drawing::Point(12, 313);
 				 this->outText->Name = L"outText";
-				 this->outText->Size = System::Drawing::Size(310, 207);
+				 this->outText->Size = System::Drawing::Size(388, 207);
 				 this->outText->TabIndex = 9;
 				 this->outText->Text = L"output";
-				 // 
-				 // encDecr
-				 // 
-				 this->encDecr->Location = System::Drawing::Point(387, 277);
-				 this->encDecr->Name = L"encDecr";
-				 this->encDecr->Size = System::Drawing::Size(120, 67);
-				 this->encDecr->TabIndex = 10;
-				 this->encDecr->Text = L"Szyfrowanie";
-				 this->encDecr->UseVisualStyleBackColor = true;
-				 this->encDecr->Click += gcnew System::EventHandler(this, &MainWindow::encDecr_Click);
 				 // 
 				 // asmButton
 				 // 
 				 this->asmButton->AutoSize = true;
-				 this->asmButton->Location = System::Drawing::Point(545, 286);
+				 this->asmButton->Location = System::Drawing::Point(596, 288);
 				 this->asmButton->Name = L"asmButton";
 				 this->asmButton->Size = System::Drawing::Size(95, 21);
 				 this->asmButton->TabIndex = 11;
@@ -224,7 +205,7 @@ namespace Enigma {
 				 // 
 				 this->cppButton->AutoSize = true;
 				 this->cppButton->Checked = true;
-				 this->cppButton->Location = System::Drawing::Point(545, 313);
+				 this->cppButton->Location = System::Drawing::Point(596, 315);
 				 this->cppButton->Name = L"cppButton";
 				 this->cppButton->Size = System::Drawing::Size(54, 21);
 				 this->cppButton->TabIndex = 12;
@@ -234,9 +215,9 @@ namespace Enigma {
 				 // 
 				 // startButton
 				 // 
-				 this->startButton->Location = System::Drawing::Point(245, 273);
+				 this->startButton->Location = System::Drawing::Point(406, 288);
 				 this->startButton->Name = L"startButton";
-				 this->startButton->Size = System::Drawing::Size(77, 34);
+				 this->startButton->Size = System::Drawing::Size(170, 48);
 				 this->startButton->TabIndex = 13;
 				 this->startButton->Text = L"Start";
 				 this->startButton->UseVisualStyleBackColor = true;
@@ -246,7 +227,7 @@ namespace Enigma {
 				 // 
 				 this->time->BackColor = System::Drawing::SystemColors::Control;
 				 this->time->BorderStyle = System::Windows::Forms::BorderStyle::Fixed3D;
-				 this->time->Location = System::Drawing::Point(198, 557);
+				 this->time->Location = System::Drawing::Point(407, 492);
 				 this->time->Name = L"time";
 				 this->time->Size = System::Drawing::Size(284, 28);
 				 this->time->TabIndex = 14;
@@ -254,7 +235,7 @@ namespace Enigma {
 				 // 
 				 // upRotor1
 				 // 
-				 this->upRotor1->Location = System::Drawing::Point(407, 104);
+				 this->upRotor1->Location = System::Drawing::Point(449, 135);
 				 this->upRotor1->Name = L"upRotor1";
 				 this->upRotor1->Size = System::Drawing::Size(35, 32);
 				 this->upRotor1->TabIndex = 15;
@@ -264,7 +245,7 @@ namespace Enigma {
 				 // 
 				 // downRotor1
 				 // 
-				 this->downRotor1->Location = System::Drawing::Point(407, 199);
+				 this->downRotor1->Location = System::Drawing::Point(449, 230);
 				 this->downRotor1->Name = L"downRotor1";
 				 this->downRotor1->Size = System::Drawing::Size(35, 32);
 				 this->downRotor1->TabIndex = 16;
@@ -274,7 +255,7 @@ namespace Enigma {
 				 // 
 				 // upRotor2
 				 // 
-				 this->upRotor2->Location = System::Drawing::Point(496, 104);
+				 this->upRotor2->Location = System::Drawing::Point(541, 135);
 				 this->upRotor2->Name = L"upRotor2";
 				 this->upRotor2->Size = System::Drawing::Size(35, 32);
 				 this->upRotor2->TabIndex = 17;
@@ -284,7 +265,7 @@ namespace Enigma {
 				 // 
 				 // upRotor3
 				 // 
-				 this->upRotor3->Location = System::Drawing::Point(584, 104);
+				 this->upRotor3->Location = System::Drawing::Point(629, 135);
 				 this->upRotor3->Name = L"upRotor3";
 				 this->upRotor3->Size = System::Drawing::Size(35, 32);
 				 this->upRotor3->TabIndex = 18;
@@ -294,7 +275,7 @@ namespace Enigma {
 				 // 
 				 // downRotor3
 				 // 
-				 this->downRotor3->Location = System::Drawing::Point(584, 199);
+				 this->downRotor3->Location = System::Drawing::Point(629, 230);
 				 this->downRotor3->Name = L"downRotor3";
 				 this->downRotor3->Size = System::Drawing::Size(35, 32);
 				 this->downRotor3->TabIndex = 19;
@@ -304,7 +285,7 @@ namespace Enigma {
 				 // 
 				 // downRotor2
 				 // 
-				 this->downRotor2->Location = System::Drawing::Point(496, 199);
+				 this->downRotor2->Location = System::Drawing::Point(541, 230);
 				 this->downRotor2->Name = L"downRotor2";
 				 this->downRotor2->Size = System::Drawing::Size(35, 32);
 				 this->downRotor2->TabIndex = 20;
@@ -316,7 +297,7 @@ namespace Enigma {
 				 // 
 				 this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 				 this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-				 this->ClientSize = System::Drawing::Size(685, 594);
+				 this->ClientSize = System::Drawing::Size(703, 535);
 				 this->Controls->Add(this->downRotor2);
 				 this->Controls->Add(this->downRotor3);
 				 this->Controls->Add(this->upRotor3);
@@ -327,7 +308,6 @@ namespace Enigma {
 				 this->Controls->Add(this->startButton);
 				 this->Controls->Add(this->cppButton);
 				 this->Controls->Add(this->asmButton);
-				 this->Controls->Add(this->encDecr);
 				 this->Controls->Add(this->outText);
 				 this->Controls->Add(this->rotor3);
 				 this->Controls->Add(this->rotor2);
@@ -343,15 +323,6 @@ namespace Enigma {
 
 			 }
 #pragma endregion
-
-	private: System::Void encDecr_Click(System::Object^  sender, System::EventArgs^  e) {
-		if (this->encDecr->Text == "Szyfrowanie") {
-			this->encDecr->Text = "Odszyfrowanie";
-		}
-		else {
-			this->encDecr->Text = "Szyfrowanie";
-		}
-	}
 	private: System::Void startButton_Click(System::Object^  sender, System::EventArgs^  e) {
 		std::string outputText;
 		char letter;
