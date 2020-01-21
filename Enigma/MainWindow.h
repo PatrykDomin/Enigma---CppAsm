@@ -8,6 +8,9 @@
 void moveRotorUp(char[26]);
 void moveRotorDown(char[26]);
 void updateRotor(System::Windows::Forms::Label^, char[26]);
+void updateAllRotors(System::Windows::Forms::Label^, System::Windows::Forms::Label^, System::Windows::Forms::Label^, char[26], char[26], char[26]);
+std::string enigmaMachineCPP(System::String^, char[26], char[26], char[26]);
+std::string enigmaMachineASM(System::String^, char[26], char[26], char[26], char[26], char[26]);
 
 namespace Enigma {
 
@@ -18,7 +21,7 @@ namespace Enigma {
 	using namespace System::Data;
 	using namespace System::Drawing;
 
-	char startingArr[26] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+	char startArr[26] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 	char rotor1Arr[26] = { 'E', 'K', 'M', 'F', 'L', 'G', 'D', 'Q', 'V', 'Z', 'N', 'T', 'O', 'W', 'Y', 'H', 'X', 'U', 'S', 'P', 'A', 'I', 'B', 'R', 'C', 'J' };
 	char rotor2Arr[26] = { 'A', 'J', 'D', 'K', 'S', 'I', 'R', 'U', 'X', 'B', 'L', 'H', 'W', 'T', 'M', 'C', 'Q', 'G', 'Z', 'N', 'P', 'Y', 'F', 'V', 'O', 'E' };
 	char rotor3Arr[26] = { 'B', 'D', 'F', 'H', 'J', 'L', 'C', 'P', 'R', 'T', 'X', 'V', 'Z', 'N', 'Y', 'E', 'I', 'W', 'G', 'A', 'K', 'M', 'U', 'S', 'Q', 'O' };
@@ -51,12 +54,8 @@ namespace Enigma {
 		}
 	private: System::Windows::Forms::TextBox^  userInput1;
 	private: System::Windows::Forms::Label^  outText;
-
 	private: System::Windows::Forms::Label^  usrInpt1Label;
 	private: System::Windows::Forms::Label^  usrInpt2Label;
-
-
-
 	private: System::Windows::Forms::Label^  enigmaText;
 	private: System::Windows::Forms::Label^  rotor1;
 	private: System::Windows::Forms::Label^  rotor2;
@@ -328,60 +327,21 @@ namespace Enigma {
 		char letter;
 		String^ userInputText = this->userInput1->Text->ToUpper();
 
-		char r1Arr[26];
-		char r2Arr[26];
-		char r3Arr[26];
-		strncpy(r1Arr, rotor1Arr, 26);
-		strncpy(r2Arr, rotor2Arr, 26);
-		strncpy(r3Arr, rotor3Arr, 26);
-
 		auto start = std::chrono::steady_clock::now();
 		this->time->Text = L"Time: ";
 
 		if (this->cppButton->Checked == true) {
-			typedef char(_stdcall *enigmaCpp)(char[], char[], char[], char);
-			HINSTANCE cppDll = LoadLibraryA("cppdll");
-			enigmaCpp enigmacpp;
-			enigmacpp = (enigmaCpp)GetProcAddress(cppDll, "enigma");
-			for (int i = 0; i < userInputText->Length; i++) { //DLA A \/
-				if (userInputText[i] == L' ') {
-					letter = ' ';
-				}
-				else {
-					letter = enigmacpp(r1Arr, r2Arr, r3Arr, userInputText[i]);
-				}
-				outputText += letter;
-				moveRotorUp(r1Arr);
-				moveRotorDown(r3Arr);
-			}
+			outputText = enigmaMachineCPP(userInputText, rotor1Arr, rotor2Arr, rotor3Arr);
 		}
 		else {
-			typedef char(_stdcall *enigmaAsm)(char*, char*, char*, char*, char*, char);
-			HINSTANCE asmDll = LoadLibraryA("asmdll");
-			enigmaAsm enigmaasm;
-			enigmaasm = (enigmaAsm)GetProcAddress(asmDll, "enigmaAsm");
-			char* start = startingArr;
-			char* r1 = r1Arr;
-			char* r2 = r2Arr;
-			char* r3 = r3Arr;
-			char* refl = reflectorArr;
-			for (int i = 0; i < userInputText->Length; i++) {
-				if (userInputText[i] == L' ') {
-					letter = ' ';
-				}
-				else {
-					letter = enigmaasm(start, r1, r2, r3, refl, userInputText[i]); //assembler
-				}
-				outputText += letter;
-				moveRotorUp(r1Arr);
-				moveRotorDown(r3Arr);
-			}
+			outputText = enigmaMachineASM(userInputText, startArr, rotor1Arr, rotor2Arr, rotor3Arr, reflectorArr);
 		}
 
 		auto end = std::chrono::steady_clock::now();
 		auto diffChrono = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 		this->time->Text = this->time->Text + diffChrono + L"µs";
 
+		updateAllRotors(rotor1, rotor2, rotor3, rotor1Arr, rotor2Arr, rotor3Arr);
 		this->outText->Text = gcnew String(outputText.c_str());
 	}
 	private: System::Void upRotor1_Click(System::Object^  sender, System::EventArgs^  e) {
