@@ -70,6 +70,7 @@ namespace Enigma {
 	private: System::Windows::Forms::Button^  downRotor2;
 	private: System::Windows::Forms::Button^  upRotor3;
 	private: System::Windows::Forms::Button^  downRotor3;
+	private: System::Windows::Forms::Label^  label1;
 
 			 /// <summary>
 			 /// Wymagana zmienna projektanta.
@@ -101,6 +102,7 @@ namespace Enigma {
 				 this->upRotor3 = (gcnew System::Windows::Forms::Button());
 				 this->downRotor3 = (gcnew System::Windows::Forms::Button());
 				 this->downRotor2 = (gcnew System::Windows::Forms::Button());
+				 this->label1 = (gcnew System::Windows::Forms::Label());
 				 this->SuspendLayout();
 				 // 
 				 // userInput1
@@ -110,6 +112,7 @@ namespace Enigma {
 				 this->userInput1->Name = L"userInput1";
 				 this->userInput1->Size = System::Drawing::Size(388, 140);
 				 this->userInput1->TabIndex = 1;
+				 this->userInput1->TextChanged += gcnew System::EventHandler(this, &MainWindow::userInput1_TextChanged);
 				 // 
 				 // usrInpt1Label
 				 // 
@@ -292,11 +295,20 @@ namespace Enigma {
 				 this->downRotor2->UseVisualStyleBackColor = true;
 				 this->downRotor2->Click += gcnew System::EventHandler(this, &MainWindow::downRotor2_Click);
 				 // 
+				 // label1
+				 // 
+				 this->label1->AutoSize = true;
+				 this->label1->Location = System::Drawing::Point(238, 104);
+				 this->label1->Name = L"label1";
+				 this->label1->Size = System::Drawing::Size(0, 17);
+				 this->label1->TabIndex = 21;
+				 // 
 				 // MainWindow
 				 // 
 				 this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 				 this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				 this->ClientSize = System::Drawing::Size(703, 535);
+				 this->Controls->Add(this->label1);
 				 this->Controls->Add(this->downRotor2);
 				 this->Controls->Add(this->downRotor3);
 				 this->Controls->Add(this->upRotor3);
@@ -322,27 +334,26 @@ namespace Enigma {
 
 			 }
 #pragma endregion
-	private: System::Void startButton_Click(System::Object^  sender, System::EventArgs^  e) {
-		std::string outputText;
-		char letter;
-		String^ userInputText = this->userInput1->Text->ToUpper();
+	private: System::Void startButton_Click(System::Object^  sender, System::EventArgs^  e) { //przycisk startu szyfrowania
+		std::string outputText; //tekst zaszyfrowany
+		char letter; //pojedyncza litera do zaszyfrowania
+		String^ userInputText = this->userInput1->Text->ToUpper(); //zapisanie do zmiennej tekstu u¿ytkownika (bez znaczenia wielkoœæ liter)
+																   //litery sa zmieniane z ma³ych na wielkie
+		auto start = std::chrono::steady_clock::now(); //odczytanie czasu jaki wskazuje zegar, zapisanie do zmiennej start
 
-		auto start = std::chrono::steady_clock::now();
-		this->time->Text = L"Time: ";
-
-		if (this->cppButton->Checked == true) {
-			outputText = enigmaMachineCPP(userInputText, rotor1Arr, rotor2Arr, rotor3Arr);
+		if (this->cppButton->Checked == true) { //sprawdzenie która biblioteka zosta³a zaznaczona
+			outputText = enigmaMachineCPP(userInputText, rotor1Arr, rotor2Arr, rotor3Arr); //wywo³anie funkcji szyfruj¹cej jedn¹ literê
 		}
 		else {
-			outputText = enigmaMachineASM(userInputText, startArr, rotor1Arr, rotor2Arr, rotor3Arr, reflectorArr);
+			outputText = enigmaMachineASM(userInputText, startArr, rotor1Arr, rotor2Arr, rotor3Arr, reflectorArr);//wywo³anie funkcji szyfruj¹cej jedn¹ literê
 		}
 
-		auto end = std::chrono::steady_clock::now();
-		auto diffChrono = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-		this->time->Text = this->time->Text + diffChrono + L"µs";
+		auto end = std::chrono::steady_clock::now(); //odczytanie czasu jaki wskazuje zegar, zapisanie do zmiennej end
+		auto diffChrono = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count(); //sprawdzenie czasu wykonania fragmentu kodu szyfruj¹cego tekst
+		this->time->Text = L"Time: " + diffChrono + L"µs"; //wyœwieltenie czasu wykoniania
 
-		updateAllRotors(rotor1, rotor2, rotor3, rotor1Arr, rotor2Arr, rotor3Arr);
-		this->outText->Text = gcnew String(outputText.c_str());
+		updateAllRotors(rotor1, rotor2, rotor3, rotor1Arr, rotor2Arr, rotor3Arr); //funkcja auaktualnia pozycje rotorów (podczas szyfrowania jest ona zmieniana)
+		this->outText->Text = gcnew String(outputText.c_str()); //wyœwietlenie zaszyfrowanego teksu u¿ytkownikowi
 	}
 	private: System::Void upRotor1_Click(System::Object^  sender, System::EventArgs^  e) {
 		moveRotorUp(rotor1Arr);
@@ -368,5 +379,8 @@ namespace Enigma {
 		moveRotorDown(rotor3Arr);
 		updateRotor(rotor3, rotor3Arr);
 	}
-	};
+private: System::Void userInput1_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+	this->label1->Text = L"Dlugosc tekstu: " + this->userInput1->TextLength;
+}
+};
 }

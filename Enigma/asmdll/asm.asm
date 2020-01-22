@@ -7,7 +7,7 @@ INCLUDE C:\masm32\include\windows.inc
 
 .DATA
 r DWORD 26
-i DWORD 0
+;i DWORD 0
 
 
 .CODE
@@ -19,35 +19,35 @@ DllEntry ENDP
 ;-------------------------------------------------------------------------
 
 
-getPosition proc arr:DWORD, character: BYTE
+getPosition proc arr:DWORD, character: BYTE ;spawdzenie indeksu 'character' w talicy 'arr'
 	
-	mov i, 0
-	mov ebx, arr
-	mov ecx, 0
-Loop1:
-	mov eax, r				;r - size
-	cmp i, eax
-	jge End1
-	mov eax, [ebx + ecx]
-	mov dl, character
-	cmp al, dl
-	jne NotEqual
-	mov eax, i
-	jmp End1
+	mov ebx, arr	;zapisanie wskaŸnika do arr do rejestru ebx
+	mov ecx, 0		;ecx - ustawienie indeksu na '0' (pocz¹tek tablicy)
+Loop1:	
+	mov eax, r		;zapisanie rozmiaru tablicy do rejestru eax (r - 26)		
+	cmp ecx, eax	;sprawdzenie czy nie wyszliœmy poza tablicê
+	jge End1		;je¿eli tak - skok do etykiety End1
+	mov eax, [ebx + ecx]	;zapisanie elementu tablicy o indeksie ecx do rejesty eax
+	mov dl, character		;zapisanie zmiennej 'character' do fragmentu rejestru edx 
+	cmp al, dl		;porównanie litery o indeksie ecx z tablicy arr ze zmienn¹ 'character'
+	jne NotEqual	;je¿eli nie s¹ równe - skok do etykiety NotEqual
+	mov eax, ecx	;zapisanie aktualnego indeksu do rejestru 
+	jmp End1		;skok do etykiety End1
 NotEqual:
-	inc ecx
-	inc i
-	jmp Loop1
+	inc ecx			;inkrementacja indeksu
+	jmp Loop1		;skok do etykiety Loop1
 End1:
-	ret
+	ret				;powrót
 
 getPosition endp
 
 enigmaAsm proc starting: DWORD, r1: DWORD, r2: DWORD, r3: DWORD, reflector: DWORD, letter: BYTE
-
-	invoke getPosition, starting, letter
-	mov edi, r1									;edi - current rotor
-	mov eax, [edi + eax]						;eax - output letter
+	
+	;funkcja szyfruj¹ca - jej dzia³anie zosta³o opisane w Schemacie dzia³ania 
+	
+	invoke getPosition, starting, letter	;wywo³anie funkcji getPosition
+	mov edi, r1								;edi - aktuala tablica
+	mov eax, [edi + eax]					;eax - tymczasowa litera
 	invoke getPosition, starting, al
 	mov edi, r2
 	mov eax, [edi + eax]
